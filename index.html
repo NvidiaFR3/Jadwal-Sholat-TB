@@ -4,14 +4,14 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Jadwal Sholat Wonogiri WIB</title>
-  <meta name="description" content="Website jadwal sholat Wonogiri dengan jam real-time WIB." />
   <style>
     :root{
-      --overlay: rgba(0,0,0,.5);
+      --overlay: rgba(0,0,0,.6);
       --card-bg: rgba(255,255,255,.12);
       --text: #fff;
       --muted: #cbd5e1;
       --accent: #22c55e;
+      --danger: #ef4444;
     }
     *{box-sizing:border-box;margin:0;padding:0}
     body{
@@ -22,31 +22,31 @@
     }
     .overlay{position:fixed; inset:0; background:var(--overlay)}
     header,footer,main{position:relative; z-index:1}
-    header{padding:16px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px}
-    header h1{font-size:22px; width:100%; text-align:center}
-    header small{color:var(--muted); font-size:13px; width:100%; text-align:center}
-    .tag{margin:0 auto; display:flex; align-items:center; gap:6px; padding:6px 10px; border-radius:999px;
-      background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.2); font-size:12px}
-    .live{width:8px; height:8px; border-radius:50%; background:#ef4444}
-    main{
-      flex:1; padding:16px; display:grid; gap:16px;
-      grid-template-columns:1fr; max-width:1200px; margin:0 auto; width:100%;
+    header{padding:20px}
+    header h1{font-size:32px;font-weight:700;margin-bottom:6px}
+    header small{color:var(--muted); font-size:20px; font-weight:600}
+    .clock-time{
+      font-size:130px; font-weight:900; letter-spacing:3px; margin-top:15px;
     }
-    @media(min-width:900px){
-      main{grid-template-columns:1fr 1fr}
+    .date-text{margin-top:10px; font-size:32px; color:var(--muted); font-weight:700}
+    .hijri-text{margin-top:5px; font-size:28px; color:var(--muted); font-weight:700}
+    .next{
+      margin:35px auto; padding:25px; border-radius:20px;
+      background:rgba(34,197,94,.15); border:2px solid rgba(34,197,94,.3);
+      max-width:900px; font-size:36px; line-height:1.5; font-weight:800;
     }
-    .card{background:var(--card-bg); backdrop-filter:blur(8px);
-      border-radius:18px; padding:20px; border:1px solid rgba(255,255,255,.2)}
-    .clock-time{font-size:56px; font-weight:700; letter-spacing:1px}
-    .clock-sub{margin-top:8px; color:var(--muted); font-size:15px}
-    .next{margin-top:14px; padding:12px; border-radius:12px;
-      background:rgba(34,197,94,.15); border:1px solid rgba(34,197,94,.3)}
-    table{width:100%; border-collapse:collapse; margin-top:12px}
-    th,td{padding:12px; text-align:center}
-    th{color:var(--muted); font-size:15px}
-    td{background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.15); font-size:18px}
-    tr.highlight td{outline:2px dashed var(--accent)}
-    footer{text-align:center; padding:20px; color:var(--muted); font-size:14px}
+    .countdown{
+      font-size:72px; font-weight:900; margin-top:15px;
+      color:var(--accent); transition:color .3s;
+    }
+    table{
+      width:100%; border-collapse:collapse; margin-top:35px; font-size:32px; font-weight:700;
+    }
+    th,td{padding:22px; text-align:center}
+    th{color:var(--muted); font-size:28px; font-weight:800}
+    td{background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.15)}
+    tr.highlight td{outline:5px solid var(--accent)}
+    footer{text-align:center; padding:20px; color:var(--muted); font-size:22px; font-weight:600}
   </style>
 </head>
 <body>
@@ -54,19 +54,17 @@
   <header>
     <h1>Jadwal Sholat — Wonogiri</h1>
     <small>Waktu Indonesia Barat (Asia/Jakarta)</small>
-    <span class="tag"><span class="live"></span> Real-time</span>
+    <div id="clock" class="clock-time">--:--:--</div>
+    <div id="dateText" class="date-text">Memuat tanggal…</div>
+    <div id="hijriText" class="hijri-text">Memuat hijriah…</div>
   </header>
 
   <main>
-    <section class="card">
-      <div class="clock-time" id="clock">--:--:--</div>
-      <div class="clock-sub" id="dateText">Memuat tanggal…</div>
-      <div class="clock-sub" id="hijriText">Memuat hijriah…</div>
-      <div class="next" id="nextPrayer">Memuat jadwal…</div>
+    <section class="next" id="nextPrayer">
+      Memuat jadwal sholat berikutnya…
     </section>
 
-    <section class="card">
-      <h2 style="margin-bottom:10px;font-size:18px">Jadwal Sholat Hari Ini</h2>
+    <section>
       <table id="prayerTable">
         <thead><tr><th>Sholat</th><th>Waktu (WIB)</th></tr></thead>
         <tbody id="tbody">
@@ -83,14 +81,12 @@
 
   <footer>© Tunas Baru Palawija 2025</footer>
 
-  <!-- Audio player tersembunyi -->
   <audio id="adhan" src="https://raw.githubusercontent.com/NvidiaFR3/Jadwal-Sholat-TB/refs/heads/main/ssstik.io_1756046999338.mp3"></audio>
 
   <script>
     const TZ='Asia/Jakarta',CITY='Wonogiri',COUNTRY='Indonesia';
-    // Pakai proxy agar lolos CORS
-    const apiURL = `https://api.aladhan.com/v1/timingsByCity?city=${CITY}&country=${COUNTRY}&method=20`;
-    const API = `https://api.allorigins.win/raw?url=${encodeURIComponent(apiURL)}`;
+    const apiURL=`https://api.aladhan.com/v1/timingsByCity?city=${CITY}&country=${COUNTRY}&method=20`;
+    const API=`https://api.allorigins.win/raw?url=${encodeURIComponent(apiURL)}`;
 
     const clockEl=document.getElementById('clock'),
           dateEl=document.getElementById('dateText'),
@@ -104,8 +100,7 @@
     const fmtHM=d=>new Intl.DateTimeFormat('id-ID',{hour:'2-digit',minute:'2-digit',hour12:false,timeZone:TZ}).format(d);
     const fmtDate=d=>new Intl.DateTimeFormat('id-ID',{weekday:'long',day:'2-digit',month:'long',year:'numeric',timeZone:TZ}).format(d);
 
-    let timings=null,hijriDate='';
-    let playedToday={}; // penanda agar tidak play berulang kali dalam 1 waktu sholat
+    let timings=null,playedToday={};
 
     function startClock(){
       function tick(){
@@ -119,16 +114,13 @@
     async function fetchTimings(){
       try{
         const res=await fetch(API);
-        if(!res.ok) throw new Error("Gagal ambil API");
         const j=await res.json();
         const t=j.data.timings;
         timings={Fajr:t.Fajr,Sunrise:t.Sunrise,Dhuhr:t.Dhuhr,Asr:t.Asr,Maghrib:t.Maghrib,Isha:t.Isha};
-        hijriDate=`${j.data.date.hijri.weekday.ar} • ${j.data.date.hijri.day} ${j.data.date.hijri.month.ar} ${j.data.date.hijri.year} H`;
-        hijriEl.textContent="Hijriah: "+hijriDate;
+        hijriEl.textContent=`Hijriah: ${j.data.date.hijri.day} ${j.data.date.hijri.month.ar} ${j.data.date.hijri.year} H`;
         renderTable(); updateNext();
       }catch(e){
-        console.error(e);
-        nextEl.textContent="⚠️ Gagal memuat jadwal. Pastikan koneksi internet tersedia.";
+        nextEl.textContent="⚠️ Gagal memuat jadwal sholat.";
       }
     }
 
@@ -145,16 +137,10 @@
     function checkAndPlayAdhan(){
       if(!timings) return;
       const now=new Date();
-      const schedule=[['Subuh',timings.Fajr],['Dzuhur',timings.Dhuhr],['Ashar',timings.Asr],['Maghrib',timings.Maghrib],['Isya',timings.Isha]]
-        .map(([n,h])=>[n,hmToDate(h)]);
-
+      const schedule=[['Subuh',timings.Fajr],['Dzuhur',timings.Dhuhr],['Ashar',timings.Asr],['Maghrib',timings.Maghrib],['Isya',timings.Isha]].map(([n,h])=>[n,hmToDate(h)]);
       for(const [name,time] of schedule){
-        if(Math.abs(now-time)<1000){ // selisih <1 detik
-          if(!playedToday[name]){
-            playedToday[name]=true;
-            adhan.currentTime=0;
-            adhan.play().catch(err=>console.log("Autoplay dicegah browser:",err));
-          }
+        if(Math.abs(now-time)<1000 && !playedToday[name]){
+          playedToday[name]=true; adhan.currentTime=0; adhan.play().catch(()=>{});
         }
       }
     }
@@ -171,7 +157,9 @@
       const tr=[...tbody.querySelectorAll('tr')].find(tr=>tr.dataset.name===name); if(tr)tr.classList.add('highlight');
       const diff=Math.floor((time-now)/1000);
       const hh=two(Math.floor(diff/3600)),mm=two(Math.floor((diff%3600)/60)),ss=two(diff%60);
-      nextEl.innerHTML=`<b>Sholat berikutnya: ${name}</b><br><small>Jam: ${fmtHM(time)} WIB • ${hh}:${mm}:${ss}</small>`;
+      const countdownEl=`<div><b>Sholat berikutnya: ${name}</b><br>Jam: <b>${fmtHM(time)} WIB</b></div>
+                         <div class="countdown" style="color:${diff<=600?'var(--danger)':'var(--accent)'}">${hh}:${mm}:${ss}</div>`;
+      nextEl.innerHTML=countdownEl;
     }
 
     setInterval(()=>{updateNext();checkAndPlayAdhan();},1000);
