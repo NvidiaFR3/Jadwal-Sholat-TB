@@ -18,7 +18,7 @@
       min-height:100vh; display:flex; flex-direction:column;
       font-family:system-ui,Segoe UI,Roboto,Ubuntu,Inter,sans-serif;
       color:var(--text); text-align:center;
-      background:#0b1220 url("https://raw.githubusercontent.com/NvidiaFR3/Jadwal-Sholat-TB/refs/heads/main/images%20(3).jpeg") center/cover fixed no-repeat;
+      background:#0b1220 url("https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1400&q=80") center/cover fixed no-repeat;
     }
     .overlay{position:fixed; inset:0; background:var(--overlay)}
     header,footer,main{position:relative; z-index:1}
@@ -28,7 +28,6 @@
     .tag{margin:0 auto; display:flex; align-items:center; gap:6px; padding:6px 10px; border-radius:999px;
       background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.2); font-size:12px}
     .live{width:8px; height:8px; border-radius:50%; background:#ef4444}
-    
     main{
       flex:1; padding:16px; display:grid; gap:16px;
       grid-template-columns:1fr; max-width:1200px; margin:0 auto; width:100%;
@@ -36,7 +35,6 @@
     @media(min-width:900px){
       main{grid-template-columns:1fr 1fr}
     }
-
     .card{background:var(--card-bg); backdrop-filter:blur(8px);
       border-radius:18px; padding:20px; border:1px solid rgba(255,255,255,.2)}
     .clock-time{font-size:56px; font-weight:700; letter-spacing:1px}
@@ -85,16 +83,19 @@
 
   <footer>© Tunas Baru Palawija 2025</footer>
 
+  <!-- Audio player tersembunyi -->
+  <audio id="adhan" src="https://raw.githubusercontent.com/NvidiaFR3/Jadwal-Sholat-TB/refs/heads/main/ssstik.io_1756046999338.mp3"></audio>
+
   <script>
     const TZ='Asia/Jakarta',CITY='Wonogiri',COUNTRY='Indonesia';
-    // pakai method=20 (Kemenag Indonesia) biar lebih tepat
     const API=`https://api.aladhan.com/v1/timingsByCity?city=${CITY}&country=${COUNTRY}&method=20`;
 
     const clockEl=document.getElementById('clock'),
           dateEl=document.getElementById('dateText'),
           hijriEl=document.getElementById('hijriText'),
           tbody=document.getElementById('tbody'),
-          nextEl=document.getElementById('nextPrayer');
+          nextEl=document.getElementById('nextPrayer'),
+          adhan=document.getElementById('adhan');
 
     const two=n=>n.toString().padStart(2,'0');
     const fmtTime=d=>new Intl.DateTimeFormat('id-ID',{hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false,timeZone:TZ}).format(d);
@@ -102,6 +103,7 @@
     const fmtDate=d=>new Intl.DateTimeFormat('id-ID',{weekday:'long',day:'2-digit',month:'long',year:'numeric',timeZone:TZ}).format(d);
 
     let timings=null,hijriDate='';
+    let playedToday={}; // penanda agar tidak play berulang kali dalam 1 waktu sholat
 
     function startClock(){
       function tick(){
@@ -138,6 +140,23 @@
       const d=new Date(); d.setHours(H,M,0,0); return d;
     }
 
+    function checkAndPlayAdhan(){
+      if(!timings) return;
+      const now=new Date();
+      const schedule=[['Subuh',timings.Fajr],['Dzuhur',timings.Dhuhr],['Ashar',timings.Asr],['Maghrib',timings.Maghrib],['Isya',timings.Isha]]
+        .map(([n,h])=>[n,hmToDate(h)]);
+
+      for(const [name,time] of schedule){
+        if(Math.abs(now-time)<1000){ // selisih <1 detik
+          if(!playedToday[name]){
+            playedToday[name]=true;
+            adhan.currentTime=0;
+            adhan.play().catch(err=>console.log("Autoplay dicegah browser:",err));
+          }
+        }
+      }
+    }
+
     function updateNext(){
       if(!timings) return;
       const now=new Date();
@@ -152,12 +171,10 @@
       const hh=two(Math.floor(diff/3600)),mm=two(Math.floor((diff%3600)/60)),ss=two(diff%60);
       nextEl.innerHTML=`<b>Sholat berikutnya: ${name}</b><br><small>Jam: ${fmtHM(time)} WIB • ${hh}:${mm}:${ss}</small>`;
     }
-    setInterval(updateNext,1000);
+
+    setInterval(()=>{updateNext();checkAndPlayAdhan();},1000);
 
     startClock(); fetchTimings();
   </script>
 </body>
-
 </html>
-
-
