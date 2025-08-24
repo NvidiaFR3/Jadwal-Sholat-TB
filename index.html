@@ -87,8 +87,10 @@
   <audio id="adhan" src="https://raw.githubusercontent.com/NvidiaFR3/Jadwal-Sholat-TB/refs/heads/main/ssstik.io_1756046999338.mp3"></audio>
 
   <script>
-        const TZ='Asia/Jakarta',CITY='Wonogiri',COUNTRY='Indonesia';
-    const API=`https://api.aladhan.com/v1/timingsByCity?city=${CITY}&country=${COUNTRY}&method=20`;
+    const TZ='Asia/Jakarta',CITY='Wonogiri',COUNTRY='Indonesia';
+    // Pakai proxy agar lolos CORS
+    const apiURL = `https://api.aladhan.com/v1/timingsByCity?city=${CITY}&country=${COUNTRY}&method=20`;
+    const API = `https://api.allorigins.win/raw?url=${encodeURIComponent(apiURL)}`;
 
     const clockEl=document.getElementById('clock'),
           dateEl=document.getElementById('dateText'),
@@ -178,5 +180,3 @@
   </script>
 </body>
 </html>
-
-
