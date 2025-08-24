@@ -75,7 +75,44 @@
   <footer>© Tunas Baru Palawija 2025</footer>
 
   <!-- Audio adzan -->
-  <audio id="adhan" src="https://raw.githubusercontent.com/NvidiaFR3/Jadwal-Sholat-TB/refs/heads/main/ssstik.io_1756046999338.mp3"></audio>
+  <script>
+  // Audio adzan baru
+  const adhanAudio = document.getElementById('adhan');
+
+  // Objek untuk menandai adzan yang sudah diputar per hari
+  let adzanPlayed = {};
+
+  // Fungsi untuk memeriksa waktu sholat dan play adzan
+  function autoPlayAdzan() {
+    if (!timings) return; // Pastikan jadwal sudah ada
+
+    const now = new Date();
+    const prayerTimes = [
+      ['Subuh', timings.Fajr],
+      ['Dzuhur', timings.Dhuhr],
+      ['Ashar', timings.Asr],
+      ['Maghrib', timings.Maghrib],
+      ['Isya', timings.Isha]
+    ].map(([name, time]) => [name, (() => {
+      const [h, m] = time.split(':').map(Number);
+      const d = new Date();
+      d.setHours(h, m, 0, 0);
+      return d;
+    })()]);
+
+    prayerTimes.forEach(([name, time]) => {
+      // Jika sekarang sama dengan waktu sholat ±1 detik
+      if (Math.abs(now - time) < 1000 && !adzanPlayed[name]) {
+        adzanPlayed[name] = true;
+        adhanAudio.currentTime = 0;
+        adhanAudio.play().catch(err => console.log('Autoplay dicegah:', err));
+      }
+    });
+  }
+
+  // Jalankan setiap 1 detik
+  setInterval(autoPlayAdzan, 1000);
+</script>
 
   <script>
     const TZ='Asia/Jakarta',CITY='Wonogiri',COUNTRY='Indonesia';
@@ -170,3 +207,4 @@
   </script>
 </body>
 </html>
+
