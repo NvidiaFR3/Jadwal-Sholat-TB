@@ -102,32 +102,61 @@ input:checked + .slider:before {transform: translateX(22px);}
   background: var(--card-bg);
   backdrop-filter: blur(10px);
   border-radius: 20px;
-  padding: 24px;
+  padding: 20px 24px; /* lebih rapat */
   border: 1px solid rgba(255,255,255,.2);
-  width: 100%;
-  max-width: 800px; /* <= diperkecil agar tabel pas di desktop */
+  width: 95%;          /* agak mentok kanan */
+  max-width: 1100px;   /* lebih lebar dari sebelumnya */
+  margin: 0 auto;      /* tetap center */
 }
 
+header {
+  padding: 10px; /* rapatkan atas */
+  gap: 4px;      /* kecilkan jarak antar elemen */
+}
+
+.clock-time {
+  font-size: 80px;
+  font-weight: 700;
+  margin: 6px 0; /* kecilkan jarak */
+}
+
+.clock-sub {
+  margin-top: 4px;
+  font-size: 16px;
+}
+
+.countdown {
+  margin-top: 10px;
+  font-size: 24px;
+}
+
+.next {
+  margin-top: 6px;
+  font-size: 18px;
+  padding: 6px;
+}
+
+/* --- Table --- */
 table {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 20px;
+  margin-top: 15px; /* kecilkan jarak dengan atas */
 }
 
 th, td {
-  padding: 10px; /* <= diperkecil */
+  padding: 10px 8px;
   text-align: center;
 }
 
 th {
   color: var(--muted);
-  font-size: 16px; /* <= diperkecil */
+  font-size: 16px;
 }
 
 td {
   background: rgba(255,255,255,.08);
   border: 1px solid rgba(255,255,255,.15);
-  font-size: 20px; /* <= diperkecil */
+  font-size: 20px;
 }
 
 tr.highlight td {
