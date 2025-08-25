@@ -6,82 +6,107 @@
   <title>Jadwal Sholat Wonogiri WIB</title>
   <meta name="description" content="Website jadwal sholat Wonogiri dengan jam real-time WIB." />
   <style>
-    :root{
-      --overlay: rgba(0,0,0,.5);
-      --card-bg: rgba(255,255,255,.12);
-      --text: #fff;
-      --muted: #cbd5e1;
-      --accent: #22c55e;
-    }
-    *{box-sizing:border-box;margin:0;padding:0}
-    body{
-      min-height:100vh; display:flex; flex-direction:column;
-      font-family:system-ui,Segoe UI,Roboto,Ubuntu,Inter,sans-serif;
-      color:var(--text); text-align:center;
-      background:#0b1220 url("https://raw.githubusercontent.com/NvidiaFR3/Jadwal-Sholat-TB/refs/heads/main/images%20(3).jpeg") center/cover fixed no-repeat;
-    }
-    .overlay{position:fixed; inset:0; background:var(--overlay)}
-    header,footer,main{position:relative; z-index:1}
-    header{padding:16px; display:flex; justify-content:center; align-items:center; flex-direction:column; gap:6px}
-    header h1{font-size:28px}
-    header small{color:var(--muted); font-size:14px}
-    .tag{margin-top:6px; display:flex; align-items:center; gap:6px; padding:6px 10px; border-radius:999px;
-      background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.2); font-size:12px}
-    .live{width:8px; height:8px; border-radius:50%; background:#ef4444}
-    main{
-      flex:1; padding:20px; display:flex; justify-content:center; align-items:center;
-    }
-    .card{
-      background:var(--card-bg); backdrop-filter:blur(10px);
-      border-radius:20px; padding:30px; border:1px solid rgba(255,255,255,.2);
-      width:100%; max-width:1000px;
-    }
-    .clock-time{font-size:90px; font-weight:700; letter-spacing:2px}
-    .clock-sub{margin-top:10px; color:var(--muted); font-size:18px}
-    .countdown{margin-top:20px; font-size:28px; font-weight:600; color:var(--accent)}
-    .next{margin-top:8px; padding:10px; font-size:20px}
-    table{width:100%; border-collapse:collapse; margin-top:30px}
-    th,td{padding:18px; text-align:center}
-    th{color:var(--muted); font-size:20px}
-    td{background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.15); font-size:28px}
-    tr.highlight td{outline:3px solid var(--accent)}
-    footer{text-align:center; padding:20px; color:var(--muted); font-size:14px}
+:root{
+  --overlay: rgba(0,0,0,.5);
+  --card-bg: rgba(255,255,255,.12);
+  --text: #fff;
+  --muted: #cbd5e1;
+  --accent: #22c55e;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  min-height:100vh; display:flex; flex-direction:column;
+  font-family:system-ui,Segoe UI,Roboto,Ubuntu,Inter,sans-serif;
+  color:var(--text); text-align:center;
+  background:#0b1220 url("") center/cover fixed no-repeat;
+}
+.overlay{position:fixed; inset:0; background:var(--overlay)}
+header,footer,main{position:relative; z-index:1}
+header{padding:16px; display:flex; justify-content:center; align-items:center; flex-direction:column; gap:6px}
+header h1{font-size:28px}
+header small{color:var(--muted); font-size:14px}
+.tag{margin-top:6px; display:flex; align-items:center; gap:6px; padding:6px 10px; border-radius:999px;
+  background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.2); font-size:12px}
+.live{width:8px; height:8px; border-radius:50%; background:#ef4444}
+main{
+  flex:1; padding:20px; display:flex; justify-content:center; align-items:center;
+}
+.card{
+  background:var(--card-bg); backdrop-filter:blur(10px);
+  border-radius:20px; padding:30px; border:1px solid rgba(255,255,255,.2);
+  width:100%; max-width:1000px;
+}
+.clock-time{font-size:90px; font-weight:700; letter-spacing:2px}
+.clock-sub{margin-top:10px; color:var(--muted); font-size:18px}
+.countdown{margin-top:20px; font-size:28px; font-weight:600; color:var(--accent)}
+.next{margin-top:8px; padding:10px; font-size:20px}
+table{width:100%; border-collapse:collapse; margin-top:30px}
+th,td{padding:18px; text-align:center}
+th{color:var(--muted); font-size:20px}
+td{background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.15); font-size:28px}
+tr.highlight td{outline:3px solid var(--accent)}
+footer{text-align:center; padding:20px; color:var(--muted); font-size:14px}
 
-    /* --- Switch & Toast --- */
-    .sound-toggle {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      z-index: 999;
-    }
-    .switch {
-      position: relative;
-      display: inline-block;
-      width: 50px;
-      height: 28px;
-    }
-    .switch input {display:none;}
-    .slider {
-      position: absolute; cursor: pointer;
-      inset: 0; background: #ccc; border-radius: 28px;
-      transition: .4s;
-    }
-    .slider:before {
-      position: absolute; content: "";
-      height: 22px; width: 22px; left: 3px; bottom: 3px;
-      background: white; transition: .4s; border-radius: 50%;
-    }
-    input:checked + .slider {background: var(--accent);}
-    input:checked + .slider:before {transform: translateX(22px);}
-    .toast {
-      position: fixed; top: 70px; right: 20px;
-      background: rgba(0,0,0,.8); color: #fff;
-      padding: 10px 16px; border-radius: 8px;
-      font-size: 14px; opacity: 0; pointer-events: none;
-      transition: opacity .4s ease;
-      z-index: 1000;
-    }
-    .toast.show {opacity: 1;}
+/* --- Switch & Toast --- */
+.sound-toggle {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 999;
+}
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 28px;
+}
+.switch input {display:none;}
+.slider {
+  position: absolute; cursor: pointer;
+  inset: 0; background: #ccc; border-radius: 28px;
+  transition: .4s;
+}
+.slider:before {
+  position: absolute; content: "";
+  height: 22px; width: 22px; left: 3px; bottom: 3px;
+  background: white; transition: .4s; border-radius: 50%;
+}
+input:checked + .slider {background: var(--accent);}
+input:checked + .slider:before {transform: translateX(22px);}
+.toast {
+  position: fixed; top: 70px; right: 20px;
+  background: rgba(0,0,0,.8); color: #fff;
+  padding: 10px 16px; border-radius: 8px;
+  font-size: 14px; opacity: 0; pointer-events: none;
+  transition: opacity .4s ease;
+  z-index: 1000;
+}
+.toast.show {opacity: 1;}
+
+/* --- RESPONSIVE --- */
+@media (max-width: 1024px) {
+  .clock-time {font-size: 70px;}
+  td {font-size: 22px; padding: 14px;}
+  th {font-size: 18px;}
+}
+@media (max-width: 768px) {
+  header h1 {font-size: 22px;}
+  .clock-time {font-size: 55px;}
+  .clock-sub {font-size: 16px;}
+  .countdown {font-size: 22px;}
+  .next {font-size: 18px;}
+  td {font-size: 20px; padding: 12px;}
+}
+@media (max-width: 480px) {
+  header h1 {font-size: 20px;}
+  .clock-time {font-size: 40px;}
+  .clock-sub {font-size: 14px;}
+  .countdown {font-size: 18px;}
+  .next {font-size: 16px;}
+  th {font-size: 16px;}
+  td {font-size: 16px; padding: 10px;}
+  .card {padding: 20px;}
+}
   </style>
 </head>
 <body>
