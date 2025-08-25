@@ -31,20 +31,10 @@ header small{color:var(--muted); font-size:14px}
 main{
   flex:1; padding:20px; display:flex; justify-content:center; align-items:center;
 }
-.card{
-  background:var(--card-bg); backdrop-filter:blur(10px);
-  border-radius:20px; padding:30px; border:1px solid rgba(255,255,255,.2);
-  width:100%; max-width:1000px;
-}
 .clock-time{font-size:90px; font-weight:700; letter-spacing:2px}
 .clock-sub{margin-top:10px; color:var(--muted); font-size:18px}
 .countdown{margin-top:20px; font-size:28px; font-weight:600; color:var(--accent)}
 .next{margin-top:8px; padding:10px; font-size:20px}
-table{width:100%; border-collapse:collapse; margin-top:30px}
-th,td{padding:18px; text-align:center}
-th{color:var(--muted); font-size:20px}
-td{background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.15); font-size:28px}
-tr.highlight td{outline:3px solid var(--accent)}
 footer{text-align:center; padding:20px; color:var(--muted); font-size:14px}
 
 /* --- Switch & Toast --- */
@@ -106,6 +96,42 @@ input:checked + .slider:before {transform: translateX(22px);}
   th {font-size: 16px;}
   td {font-size: 16px; padding: 10px;}
   .card {padding: 20px;}
+}
+
+.card {
+  background: var(--card-bg);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  padding: 24px;
+  border: 1px solid rgba(255,255,255,.2);
+  width: 100%;
+  max-width: 800px; /* <= diperkecil agar tabel pas di desktop */
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+th, td {
+  padding: 10px; /* <= diperkecil */
+  text-align: center;
+}
+
+th {
+  color: var(--muted);
+  font-size: 16px; /* <= diperkecil */
+}
+
+td {
+  background: rgba(255,255,255,.08);
+  border: 1px solid rgba(255,255,255,.15);
+  font-size: 20px; /* <= diperkecil */
+}
+
+tr.highlight td {
+  outline: 2px solid var(--accent);
 }
   </style>
 </head>
