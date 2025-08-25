@@ -22,9 +22,6 @@ body{
 }
 .overlay{position:fixed; inset:0; background:var(--overlay)}
 header,footer,main{position:relative; z-index:1}
-header{padding:16px; display:flex; justify-content:center; align-items:center; flex-direction:column; gap:6px}
-header h1{font-size:28px}
-header small{color:var(--muted); font-size:14px}
 .tag{margin-top:6px; display:flex; align-items:center; gap:6px; padding:6px 10px; border-radius:999px;
   background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.2); font-size:12px}
 .live{width:8px; height:8px; border-radius:50%; background:#ef4444}
@@ -98,65 +95,70 @@ input:checked + .slider:before {transform: translateX(22px);}
   .card {padding: 20px;}
 }
 
+/* --- CARD --- */
 .card {
   background: var(--card-bg);
   backdrop-filter: blur(10px);
   border-radius: 20px;
-  padding: 20px 24px; /* lebih rapat */
+  padding: 18px 22px; /* agak rapat */
   border: 1px solid rgba(255,255,255,.2);
-  width: 95%;          /* agak mentok kanan */
-  max-width: 1100px;   /* lebih lebar dari sebelumnya */
-  margin: 0 auto;      /* tetap center */
+  width: 95%;
+  max-width: 1100px;
+  margin: 0 auto;
 }
 
+/* --- HEADER & CLOCK --- */
 header {
-  padding: 10px; /* rapatkan atas */
-  gap: 4px;      /* kecilkan jarak antar elemen */
+  padding: 8px;
+  gap: 4px;
 }
-
+header h1 {
+  font-size: 22px; /* kecilkan judul */
+}
+header small {
+  font-size: 13px;
+}
 .clock-time {
-  font-size: 80px;
-  font-weight: 700;
-  margin: 6px 0; /* kecilkan jarak */
+  font-size: 55px; /* diperkecil dari 80px */
+  font-weight: 600;
+  margin: 6px 0;
 }
-
 .clock-sub {
+  margin-top: 3px;
+  font-size: 14px;
+}
+.countdown {
+  margin-top: 8px;
+  font-size: 18px;
+}
+.next {
   margin-top: 4px;
   font-size: 16px;
+  padding: 4px;
 }
 
-.countdown {
-  margin-top: 10px;
-  font-size: 24px;
-}
-
-.next {
-  margin-top: 6px;
-  font-size: 18px;
-  padding: 6px;
-}
-
-/* --- Table --- */
+/* --- TABLE --- */
 table {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 15px; /* kecilkan jarak dengan atas */
+  margin-top: 12px;
 }
 
 th, td {
-  padding: 10px 8px;
+  padding: 14px 10px;
   text-align: center;
 }
 
 th {
   color: var(--muted);
-  font-size: 16px;
+  font-size: 18px; /* sedikit lebih besar */
 }
 
 td {
   background: rgba(255,255,255,.08);
   border: 1px solid rgba(255,255,255,.15);
-  font-size: 20px;
+  font-size: 28px; /* dibesarkan agar jelas */
+  font-weight: 700;
 }
 
 tr.highlight td {
