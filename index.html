@@ -22,35 +22,80 @@
     }
     .overlay{position:fixed; inset:0; background:var(--overlay)}
     header,footer,main{position:relative; z-index:1}
-    header{padding:16px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px}
-    header h1{font-size:22px; width:100%; text-align:center}
-    header small{color:var(--muted); font-size:13px; width:100%; text-align:center}
-    .tag{margin:0 auto; display:flex; align-items:center; gap:6px; padding:6px 10px; border-radius:999px;
+    header{padding:16px; display:flex; justify-content:center; align-items:center; flex-direction:column; gap:6px}
+    header h1{font-size:28px}
+    header small{color:var(--muted); font-size:14px}
+    .tag{margin-top:6px; display:flex; align-items:center; gap:6px; padding:6px 10px; border-radius:999px;
       background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.2); font-size:12px}
     .live{width:8px; height:8px; border-radius:50%; background:#ef4444}
     main{
-      flex:1; padding:16px; display:grid; gap:16px;
-      grid-template-columns:1fr; max-width:1200px; margin:0 auto; width:100%;
+      flex:1; padding:20px; display:flex; justify-content:center; align-items:center;
     }
-    @media(min-width:900px){
-      main{grid-template-columns:1fr 1fr}
+    .card{
+      background:var(--card-bg); backdrop-filter:blur(10px);
+      border-radius:20px; padding:30px; border:1px solid rgba(255,255,255,.2);
+      width:100%; max-width:1000px;
     }
-    .card{background:var(--card-bg); backdrop-filter:blur(8px);
-      border-radius:18px; padding:20px; border:1px solid rgba(255,255,255,.2)}
-    .clock-time{font-size:56px; font-weight:700; letter-spacing:1px}
-    .clock-sub{margin-top:8px; color:var(--muted); font-size:15px}
-    .next{margin-top:14px; padding:12px; border-radius:12px;
-      background:rgba(34,197,94,.15); border:1px solid rgba(34,197,94,.3)}
-    table{width:100%; border-collapse:collapse; margin-top:12px}
-    th,td{padding:12px; text-align:center}
-    th{color:var(--muted); font-size:15px}
-    td{background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.15); font-size:18px}
-    tr.highlight td{outline:2px dashed var(--accent)}
+    .clock-time{font-size:90px; font-weight:700; letter-spacing:2px}
+    .clock-sub{margin-top:10px; color:var(--muted); font-size:18px}
+    .countdown{margin-top:20px; font-size:28px; font-weight:600; color:var(--accent)}
+    .next{margin-top:8px; padding:10px; font-size:20px}
+    table{width:100%; border-collapse:collapse; margin-top:30px}
+    th,td{padding:18px; text-align:center}
+    th{color:var(--muted); font-size:20px}
+    td{background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.15); font-size:28px}
+    tr.highlight td{outline:3px solid var(--accent)}
     footer{text-align:center; padding:20px; color:var(--muted); font-size:14px}
+
+    /* --- Switch & Toast --- */
+    .sound-toggle {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 999;
+    }
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 50px;
+      height: 28px;
+    }
+    .switch input {display:none;}
+    .slider {
+      position: absolute; cursor: pointer;
+      inset: 0; background: #ccc; border-radius: 28px;
+      transition: .4s;
+    }
+    .slider:before {
+      position: absolute; content: "";
+      height: 22px; width: 22px; left: 3px; bottom: 3px;
+      background: white; transition: .4s; border-radius: 50%;
+    }
+    input:checked + .slider {background: var(--accent);}
+    input:checked + .slider:before {transform: translateX(22px);}
+    .toast {
+      position: fixed; top: 70px; right: 20px;
+      background: rgba(0,0,0,.8); color: #fff;
+      padding: 10px 16px; border-radius: 8px;
+      font-size: 14px; opacity: 0; pointer-events: none;
+      transition: opacity .4s ease;
+      z-index: 1000;
+    }
+    .toast.show {opacity: 1;}
   </style>
 </head>
 <body>
   <div class="overlay"></div>
+
+  <!-- Switch Suara -->
+  <div class="sound-toggle">
+    <label class="switch">
+      <input type="checkbox" id="soundSwitch">
+      <span class="slider"></span>
+    </label>
+  </div>
+  <div id="toast" class="toast"></div>
+
   <header>
     <h1>Jadwal Sholat — Wonogiri</h1>
     <small>Waktu Indonesia Barat (Asia/Jakarta)</small>
@@ -62,11 +107,10 @@
       <div class="clock-time" id="clock">--:--:--</div>
       <div class="clock-sub" id="dateText">Memuat tanggal…</div>
       <div class="clock-sub" id="hijriText">Memuat hijriah…</div>
-      <div class="next" id="nextPrayer">Memuat jadwal…</div>
-    </section>
 
-    <section class="card">
-      <h2 style="margin-bottom:10px;font-size:18px">Jadwal Sholat Hari Ini</h2>
+      <div class="countdown" id="countdownText">Menghitung waktu sholat berikutnya…</div>
+      <div class="next" id="nextPrayer">Memuat jadwal…</div>
+
       <table id="prayerTable">
         <thead><tr><th>Sholat</th><th>Waktu (WIB)</th></tr></thead>
         <tbody id="tbody">
@@ -87,14 +131,17 @@
   <script>
     const TZ='Asia/Jakarta',CITY='Wonogiri',COUNTRY='Indonesia';
     const apiURL = `https://api.aladhan.com/v1/timingsByCity?city=${CITY}&country=${COUNTRY}&method=20`;
-    const API = `https://api.allorigins.win/raw?url=${encodeURIComponent(apiURL)}`;
+    const API = apiURL;
 
     const clockEl=document.getElementById('clock'),
           dateEl=document.getElementById('dateText'),
           hijriEl=document.getElementById('hijriText'),
           tbody=document.getElementById('tbody'),
           nextEl=document.getElementById('nextPrayer'),
-          adhan=document.getElementById('adhan');
+          countdownEl=document.getElementById('countdownText'),
+          adhan=document.getElementById('adhan'),
+          soundSwitch=document.getElementById('soundSwitch'),
+          toast=document.getElementById('toast');
 
     const two=n=>n.toString().padStart(2,'0');
     const fmtTime=d=>new Intl.DateTimeFormat('id-ID',{hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false,timeZone:TZ}).format(d);
@@ -102,7 +149,24 @@
     const fmtDate=d=>new Intl.DateTimeFormat('id-ID',{weekday:'long',day:'2-digit',month:'long',year:'numeric',timeZone:TZ}).format(d);
 
     let timings=null,hijriDate='';
-    let playedToday={}; // penanda agar tidak play berulang kali dalam 1 waktu sholat
+    let playedToday={};
+    let soundEnabled=false;
+
+    function showToast(msg){
+      toast.textContent=msg;
+      toast.classList.add("show");
+      setTimeout(()=>toast.classList.remove("show"),3000);
+    }
+
+    soundSwitch.addEventListener("change",()=>{
+      soundEnabled=soundSwitch.checked;
+      if(soundEnabled){
+        adhan.play().then(()=>{adhan.pause(); adhan.currentTime=0;});
+        showToast("🔊 Suara aktif, adzan akan otomatis diputar");
+      } else {
+        showToast("🔇 Suara dimatikan, adzan tidak akan diputar");
+      }
+    });
 
     function startClock(){
       function tick(){
@@ -140,13 +204,12 @@
     }
 
     function checkAndPlayAdhan(){
-      if(!timings) return;
+      if(!timings||!soundEnabled) return;
       const now=new Date();
       const schedule=[['Subuh',timings.Fajr],['Dzuhur',timings.Dhuhr],['Ashar',timings.Asr],['Maghrib',timings.Maghrib],['Isya',timings.Isha]]
         .map(([n,h])=>[n,hmToDate(h)]);
-
       for(const [name,time] of schedule){
-        if(Math.abs(now-time)<1000){ // selisih <1 detik
+        if(Math.abs(now-time)<1000){
           if(!playedToday[name]){
             playedToday[name]=true;
             adhan.currentTime=0;
@@ -168,7 +231,8 @@
       const tr=[...tbody.querySelectorAll('tr')].find(tr=>tr.dataset.name===name); if(tr)tr.classList.add('highlight');
       const diff=Math.floor((time-now)/1000);
       const hh=two(Math.floor(diff/3600)),mm=two(Math.floor((diff%3600)/60)),ss=two(diff%60);
-      nextEl.innerHTML=`<b>Sholat berikutnya: ${name}</b><br><small>Jam: ${fmtHM(time)} WIB • ${hh}:${mm}:${ss}</small>`;
+      countdownEl.textContent=`${hh}:${mm}:${ss} lagi menuju ${name}`;
+      nextEl.innerHTML=`<b>Sholat berikutnya: ${name}</b><br><small>Jam: ${fmtHM(time)} WIB</small>`;
     }
 
     setInterval(()=>{updateNext();checkAndPlayAdhan();},1000);
@@ -177,4 +241,3 @@
   </script>
 </body>
 </html>
-
